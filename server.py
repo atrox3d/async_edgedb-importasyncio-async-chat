@@ -2,6 +2,8 @@ import asyncio
 import sys
 from typing import IO
 
+from streams import split_lines
+
 
 async def handle_connection(
     reader: asyncio.StreamReader, 
@@ -10,7 +12,8 @@ async def handle_connection(
     addr = writer.get_extra_info("peername")
     print(f'connection from {addr!r}')
     
-    while message := await reader.read(100):
+    # while message := await reader.read(100):
+    async for message in split_lines(reader):       # why async for and not for message in await split_lines ?
         text = message.decode()
         print(f'received {text!r} from {addr!r}')
         print(f'sending {text!r}', file=sys.stderr)
